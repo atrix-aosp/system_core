@@ -435,8 +435,17 @@ static void *parse_service(struct parse_state *state, int nargs, char **args)
 
     svc = service_find_by_name(args[1]);
     if (svc) {
+#ifdef OMAP_ENHANCEMENT
+        NOTICE("%s: %d duplicate definition of service '%s': remove previous declaration\n",
+                state->filename,
+                state->line,
+                svc->name);
+        list_remove(&svc->onrestart.commands);
+        list_remove(&svc->slist);
+#else
         parse_error(state, "ignored duplicate definition of service '%s'\n", args[1]);
         return 0;
+#endif
     }
 
     nargs -= 2;
